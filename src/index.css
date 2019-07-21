@@ -8,20 +8,18 @@
   width: 50px;
 }
 
-.board__box button {
-  background-color: transparent;
-  border: 1px solid;
-  font-size: 20px;
+.board__box div {
+  background-size: cover;
+  font-size: 32px;
   height: 100%;
+  line-height: 50px;
+  text-align: center;
   width: 100%;
 }
 
 .board__box img {
-  width: 100%;
-}
-
-button::-moz-focus-inner {
-  border: none;
+  width: 70%;
+  padding: 15%;
 }
 
 .clearFix {

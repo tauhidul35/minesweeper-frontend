@@ -20,7 +20,9 @@ class Board extends Component {
     }
 
     this.state = {
-      userInputs: userInputs
+      userInputs: userInputs,
+      gameEnded: false,
+      success: false
     };
 
     this.handleBoxLeftClick = this.handleBoxLeftClick.bind(this);
@@ -28,6 +30,16 @@ class Board extends Component {
   }
 
   handleBoxLeftClick(row, col) {
+    if(this.realValues[row][col] === -1) {
+      this.setState({
+        gameEnded: true,
+        success: false
+      });
+    }
+    else if(this.realValues[row][col] === 0) {
+      // ToDo: will open all boxes around it
+    }
+
     let userInputs = this.state.userInputs;
     userInputs[row][col] = BOX_VALUE['open'];
     this.setState({userInputs: userInputs});
@@ -35,7 +47,19 @@ class Board extends Component {
 
   handleBoxRightClick(row, col) {
     let userInputs = this.state.userInputs;
-    userInputs[row][col] = BOX_VALUE['flagged'];
+    if(userInputs[row][col] === BOX_VALUE['hidden']) {
+      userInputs[row][col] = BOX_VALUE['flagged'];
+    }
+    else if(userInputs[row][col] === BOX_VALUE['flagged']) {
+      userInputs[row][col] = BOX_VALUE['marked'];
+    }
+    else if(userInputs[row][col] === BOX_VALUE['marked']) {
+      userInputs[row][col] = BOX_VALUE['hidden'];
+    }
+    else if(userInputs[row][col] === BOX_VALUE['open']) {
+      // ToDo: Will open all boxes around it if safe mode
+    }
+
     this.setState({userInputs: userInputs});
   }
 
@@ -50,8 +74,9 @@ class Board extends Component {
             key={'row'+i+'-col'+j}
             value={this.realValues[i][j]}
             userInput={userInputs[i][j]}
-            row={i}
-            col={j}
+            position={[i,j]}
+            gameEnded={this.state.gameEnded}
+            success={this.state.success}
             handleLeftClick={this.handleBoxLeftClick}
             handleRightClick={this.handleBoxRightClick}
           />
@@ -68,7 +93,6 @@ class Board extends Component {
     return (
       <div className='board' style={{width: size*50 + 'px'}}>
         {board}
-        {console.log(this.state.userInputs)}
       </div>
     )
   }
