@@ -18,25 +18,23 @@ function createBoard(boardSize, numberOfMines) {
     }
   }
 
-  let i = 0;
-  for(let j = 0; j < boardSize; j++) {
-    if(board[i][j] !== -1) {
-      board[i][j] = [board[i][j-1], board[i][j+1], board[i+1][j-1], board[i+1][j], board[i+1][j+1]].filter(x => x === -1).length
-    }
-  }
-
-  for(i++; i < boardSize - 1; i++) {
+  for(let i = 0; i < boardSize - 1; i++) {
     for(let j = 0; j < boardSize; j++) {
-      if(board[i][j] !== -1) {
-        board[i][j] = [board[i-1][j-1], board[i-1][j], board[i-1][j+1], board[i][j-1], board[i][j+1],
-          board[i+1][j-1], board[i+1][j], board[i+1][j+1]].filter(x => x === -1).length
+      if(board[i][j] === -1) {
+        continue;
       }
-    }
-  }
 
-  for(let j = 0; j < boardSize; j++) {
-    if(board[boardSize-1][j] !== -1) {
-      board[i][j] = [board[i-1][j-1], board[i-1][j], board[i-1][j+1], board[i][j-1], board[i][j+1]].filter(x => x === -1).length
+      let adjacent = [[board[i][j-1], board[i][j+1]]];
+
+      if(i > 0) {
+        adjacent.push([board[i-1][j-1], board[i-1][j], board[i-1][j+1]]);
+      }
+
+      if(i > 0) {
+        adjacent.push([board[i+1][j-1], board[i+1][j], board[i+1][j+1]]);
+      }
+
+      board[i][j] = adjacent.filter(x => x === -1).length
     }
   }
 
