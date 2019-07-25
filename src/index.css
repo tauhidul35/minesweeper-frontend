@@ -10,6 +10,7 @@
 
 .board__box div {
   background-size: cover;
+  border: 1px solid;
   font-size: 32px;
   height: 100%;
   line-height: 50px;

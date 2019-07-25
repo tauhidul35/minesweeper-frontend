@@ -37,13 +37,16 @@ class Box extends Component {
     if(this.props.userInput === BOX_VALUE['open']) {
       if(this.props.value === -1) {
         value =
-          <div style={{backgroundImage: `url(${TileIcon})`}}>
+          <div>
             <img src={MineRedIcon} alt='Mine'/>
           </div>
       }
+      else if(this.props.value === 0) {
+        value = <div> </div>;
+      }
       else {
         value =
-          <div style={{backgroundImage: `url(${TileIcon})`}} onClick={this.handleLeftClick}>
+          <div onClick={this.handleLeftClick}>
             {this.props.value}
           </div>;
       }
@@ -51,7 +54,7 @@ class Box extends Component {
     else if(this.props.userInput === BOX_VALUE['hidden']) {
       if(this.props.gameEnded && this.props.value === -1) {
         value =
-          <div style={{backgroundImage: `url(${TileIcon})`}}>
+          <div>
             <img src={MineGrayIcon} alt='Mine'/>
           </div>
       }
@@ -76,7 +79,7 @@ class Box extends Component {
     else if(this.props.userInput === BOX_VALUE['marked']) {
       if(this.props.gameEnded && this.props.value === -1) {
         value =
-          <div style={{backgroundImage: `url(${TileIcon})`}}>
+          <div>
             <img src={MineGrayIcon} alt='Mine'/>
           </div>
       }
