@@ -18,20 +18,20 @@ function createBoard(boardSize, numberOfMines) {
     }
   }
 
-  for(let i = 0; i < boardSize - 1; i++) {
+  for(let i = 0; i < boardSize; i++) {
     for(let j = 0; j < boardSize; j++) {
       if(board[i][j] === -1) {
         continue;
       }
 
-      let adjacent = [[board[i][j-1], board[i][j+1]]];
+      let adjacent = [board[i][j-1], board[i][j+1]];
 
       if(i > 0) {
-        adjacent.push([board[i-1][j-1], board[i-1][j], board[i-1][j+1]]);
+        adjacent.push(...[board[i-1][j-1], board[i-1][j], board[i-1][j+1]]);
       }
 
-      if(i > 0) {
-        adjacent.push([board[i+1][j-1], board[i+1][j], board[i+1][j+1]]);
+      if(i < boardSize -1) {
+        adjacent.push(...[board[i+1][j-1], board[i+1][j], board[i+1][j+1]]);
       }
 
       board[i][j] = adjacent.filter(x => x === -1).length
@@ -62,20 +62,70 @@ class Board extends Component {
     this.handleBoxRightClick = this.handleBoxRightClick.bind(this);
   }
 
-  handleBoxLeftClick(row, col) {
-    if(this.realBoard[row][col] === -1) {
+  openBox(row, col, openMine = true) {
+    let myBoard = this.state.myBoard;
+
+    if(myBoard[row][col] === BOX_VALUE['open'] || myBoard[row][col] === BOX_VALUE['flagged']) {
+      return false;
+    }
+
+    if(this.realBoard[row][col] !== -1 || openMine) {
+      myBoard[row][col] = BOX_VALUE['open'];
+      this.setState({myBoard: myBoard});
+    }
+
+    if(this.realBoard[row][col] === -1 && openMine) {
       this.setState({
         gameEnded: true,
         success: false
       });
     }
     else if(this.realBoard[row][col] === 0) {
-      // ToDo: will open all boxes around it
+      this.openAdjacentBoxes(row, col);
+    }
+  }
+
+  openAdjacentBoxes(row, col) {
+    const myBoard = this.state.myBoard;
+    const maxIndex = myBoard.length - 1;
+    let openMine = false;
+
+    // check if all flag is added
+    if(this.realBoard[row][col] !== 0) {
+      let numberOfFlags = [myBoard[row][col - 1], myBoard[row][col + 1]].filter(value => value === BOX_VALUE['flagged']).length;
+
+      if (row > 0) {
+        numberOfFlags += [myBoard[row - 1][col - 1], myBoard[row - 1][col], myBoard[row - 1][col + 1]].filter(value => value === BOX_VALUE['flagged']).length;
+      }
+
+      if (row < maxIndex) {
+        numberOfFlags += [myBoard[row + 1][col - 1], myBoard[row + 1][col], myBoard[row + 1][col + 1]].filter(value => value === BOX_VALUE['flagged']).length;
+      }
+
+      if (numberOfFlags !== this.realBoard[row][col]) {
+        return false;
+      }
+      openMine = true;
     }
 
-    let myBoard = this.state.myBoard;
-    myBoard[row][col] = BOX_VALUE['open'];
-    this.setState({myBoard: myBoard});
+    // open all adjacent boxes
+    if(row > 0 && col > 0) { this.openBox(row-1, col-1, openMine); }
+    if(row > 0) { this.openBox(row-1, col, openMine); }
+    if(row > 0 && col < maxIndex) { this.openBox(row-1, col+1, openMine); }
+    if(col > 0) { this.openBox(row, col-1, openMine); }
+    if(col < maxIndex) { this.openBox(row, col+1, openMine); }
+    if(row < maxIndex && col > 0) { this.openBox(row+1, col-1, openMine); }
+    if(row < maxIndex) { this.openBox(row+1, col, openMine); }
+    if(row < maxIndex && col < maxIndex) { this.openBox(row+1, col, openMine); }
+  }
+
+  handleBoxLeftClick(row, col) {
+    if(this.state.myBoard[row][col] === BOX_VALUE['open']) {
+      this.openAdjacentBoxes(row, col);
+    }
+    else {
+      this.openBox(row, col, true);
+    }
   }
 
   handleBoxRightClick(row, col) {
@@ -90,7 +140,7 @@ class Board extends Component {
       myBoard[row][col] = BOX_VALUE['hidden'];
     }
     else if(myBoard[row][col] === BOX_VALUE['open']) {
-      // ToDo: Will open all boxes around it if safe mode
+      this.openAdjacentBoxes(row, col);
     }
 
     this.setState({myBoard: myBoard});
