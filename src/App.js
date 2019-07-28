@@ -1,8 +1,8 @@
 import React from 'react';
-import Board from './app/Board'
+import Minesweeper from './Minesweeper'
 
 function App() {
-  return <Board size={10} mine={12}/>;
+  return <Minesweeper/>;
 }
 
 export default App;
