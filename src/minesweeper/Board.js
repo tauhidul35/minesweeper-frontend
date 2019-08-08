@@ -174,7 +174,7 @@ class Board extends Component {
     }
 
     return (
-      <div className='board' style={{width: size*50 + 'px'}}>
+      <div className='board' style={{width: `${size*50+2}px`}}>
         {board}
       </div>
     )
