@@ -79,6 +79,7 @@ class Board extends Component {
         gameEnded: true,
         success: false
       });
+      this.props.handleGameRunning(false);
     }
     else if(this.realBoard[row][col] === 0) {
       this.openAdjacentBoxes(row, col);
@@ -120,6 +121,8 @@ class Board extends Component {
   }
 
   handleBoxLeftClick(row, col) {
+    this.props.handleGameRunning(true);
+
     if(this.state.myBoard[row][col] === BOX_VALUE['open']) {
       this.openAdjacentBoxes(row, col);
     }
@@ -129,6 +132,8 @@ class Board extends Component {
   }
 
   handleBoxRightClick(row, col) {
+    this.props.handleGameRunning(true);
+
     let myBoard = this.state.myBoard;
     if(myBoard[row][col] === BOX_VALUE['hidden']) {
       myBoard[row][col] = BOX_VALUE['flagged'];
