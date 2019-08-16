@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
+import BOX_VALUE from "./minesweeper/BoxValue";
 import Board from './minesweeper/Board';
 import ControlPanel from './minesweeper/ControlPanel';
-import BOX_VALUE from "./minesweeper/BoxValue";
+import Display from './minesweeper/Display';
 
 const CreateBoard = (boardSize, numberOfMines) => {
   let board = [];
@@ -62,7 +63,8 @@ class Minesweeper extends Component {
       success: false,
       boardSize: defaultBoardSize,
       totalMine: defaultTotalMine,
-      userBoard: userBoard
+      userBoard: userBoard,
+      flagCount: 0
     };
 
     // Create game board with random mines position
@@ -76,11 +78,15 @@ class Minesweeper extends Component {
   openBox(row, col, openMine = true) {
     let userBoard = this.state.userBoard;
 
-    if(userBoard[row][col] === BOX_VALUE['open'] || userBoard[row][col] === BOX_VALUE['flagged']) {
+    if(userBoard[row][col] === BOX_VALUE['open']) {
       return false;
     }
 
     if(this.gameBoard[row][col] !== -1 || openMine) {
+      if(userBoard[row][col] === BOX_VALUE['flagged']) {
+        this.setState((state) => { return {flagCount: state.flagCount - 1} });
+      }
+
       userBoard[row][col] = BOX_VALUE['open'];
       this.setState({userBoard: userBoard});
     }
@@ -145,11 +151,19 @@ class Minesweeper extends Component {
     this.setState({gameStarted: true});
 
     let userBoard = this.state.userBoard;
+    let flagCount = this.state.flagCount;
     if(userBoard[row][col] === BOX_VALUE['hidden']) {
-      userBoard[row][col] = BOX_VALUE['flagged'];
+      if(flagCount < this.state.totalMine) {
+        userBoard[row][col] = BOX_VALUE['flagged'];
+        flagCount++;
+      }
+      else {
+        userBoard[row][col] = BOX_VALUE['marked'];
+      }
     }
     else if(userBoard[row][col] === BOX_VALUE['flagged']) {
       userBoard[row][col] = BOX_VALUE['marked'];
+      flagCount--;
     }
     else if(userBoard[row][col] === BOX_VALUE['marked']) {
       userBoard[row][col] = BOX_VALUE['hidden'];
@@ -158,7 +172,10 @@ class Minesweeper extends Component {
       this.openAdjacentBoxes(row, col);
     }
 
-    this.setState({userBoard: userBoard});
+    this.setState({
+      userBoard: userBoard,
+      flagCount: flagCount
+    });
   }
 
   startNewGame() {
@@ -173,7 +190,8 @@ class Minesweeper extends Component {
       gameStarted: false,
       gameEnded: false,
       success: false,
-      userBoard: userBoard
+      userBoard: userBoard,
+      flagCount: 0
     });
 
     // Create game board with random mines position
@@ -201,6 +219,7 @@ class Minesweeper extends Component {
             gameEnded={this.state.gameEnded}
             startNewGame={this.startNewGame}
           />
+          <Display totalMine={this.state.totalMine} flagCount={this.state.flagCount}/>
         </div>
       </div>
     );
