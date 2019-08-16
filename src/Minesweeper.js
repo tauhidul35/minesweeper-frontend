@@ -64,7 +64,8 @@ class Minesweeper extends Component {
       boardSize: defaultBoardSize,
       totalMine: defaultTotalMine,
       userBoard: userBoard,
-      flagCount: 0
+      flagCount: 0,
+      timeCount: 0
     };
 
     // Create game board with random mines position
@@ -191,11 +192,25 @@ class Minesweeper extends Component {
       gameEnded: false,
       success: false,
       userBoard: userBoard,
-      flagCount: 0
+      flagCount: 0,
+      timeCount: 0
     });
 
     // Create game board with random mines position
     this.gameBoard = CreateBoard(size, this.state.totalMine);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if(this.state.gameStarted !== prevState.gameStarted || this.state.gameEnded !== prevState.gameEnded) {
+      if(this.state.gameStarted && !this.state.gameEnded) {
+        this.timerId = setInterval(() => this.setState((state) => {
+          return {timeCount: state.timeCount + 1}
+        }), 1000);
+      }
+      else {
+        clearInterval(this.timerId);
+      }
+    }
   }
 
   render() {
@@ -219,7 +234,11 @@ class Minesweeper extends Component {
             gameEnded={this.state.gameEnded}
             startNewGame={this.startNewGame}
           />
-          <Display totalMine={this.state.totalMine} flagCount={this.state.flagCount}/>
+          <Display
+            totalMine={this.state.totalMine}
+            flagCount={this.state.flagCount}
+            timeCount={this.state.timeCount}
+          />
         </div>
       </div>
     );
