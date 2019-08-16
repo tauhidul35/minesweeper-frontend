@@ -57,12 +57,12 @@ class Minesweeper extends Component {
     }
 
     this.state = {
+      gameStarted: false,
       gameEnded: false,
       success: false,
       boardSize: defaultBoardSize,
       totalMine: defaultTotalMine,
-      userBoard: userBoard,
-      gameStarted: false
+      userBoard: userBoard
     };
 
     // Create game board with random mines position
@@ -70,6 +70,7 @@ class Minesweeper extends Component {
 
     this.leftClickOnBox = this.leftClickOnBox.bind(this);
     this.rightClickOnBox = this.rightClickOnBox.bind(this);
+    this.startNewGame = this.startNewGame.bind(this);
   }
 
   openBox(row, col, openMine = true) {
@@ -160,6 +161,25 @@ class Minesweeper extends Component {
     this.setState({userBoard: userBoard});
   }
 
+  startNewGame() {
+    const size = this.state.boardSize;
+    // Create empty user board
+    let userBoard = [];
+    for (let i = 0; i < size; i++) {
+      userBoard.push(Array(size).fill(BOX_VALUE['hidden']));
+    }
+
+    this.setState({
+      gameStarted: false,
+      gameEnded: false,
+      success: false,
+      userBoard: userBoard
+    });
+
+    // Create game board with random mines position
+    this.gameBoard = CreateBoard(size, this.state.totalMine);
+  }
+
   render() {
     return (
       <div className='row'>
@@ -176,7 +196,11 @@ class Minesweeper extends Component {
           />
         </div>
         <div className='col-4'>
-          <ControlPanel gameRunning={this.state.gameStarted && !this.state.gameEnded}/>
+          <ControlPanel
+            gameStarted={this.state.gameStarted}
+            gameEnded={this.state.gameEnded}
+            startNewGame={this.startNewGame}
+          />
         </div>
       </div>
     );
