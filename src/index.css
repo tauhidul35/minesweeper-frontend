@@ -38,6 +38,15 @@
   width: 36px;
 }
 
+.paused-board {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  background-color: #EEE;
+  font-size: 32px;
+}
+
 .clearFix {
   clear: both;
 }

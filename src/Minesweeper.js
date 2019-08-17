@@ -3,6 +3,7 @@ import BOX_VALUE from "./minesweeper/BoxValue";
 import Board from './minesweeper/Board';
 import ControlPanel from './minesweeper/ControlPanel';
 import Display from './minesweeper/Display';
+import Paused from './minesweeper/Paused';
 
 const CreateBoard = (boardSize, numberOfMines) => {
   let board = [];
@@ -60,6 +61,7 @@ class Minesweeper extends Component {
     this.state = {
       gameStarted: false,
       gameEnded: false,
+      gamePaused: false,
       success: false,
       boardSize: defaultBoardSize,
       totalMine: defaultTotalMine,
@@ -74,6 +76,7 @@ class Minesweeper extends Component {
     this.leftClickOnBox = this.leftClickOnBox.bind(this);
     this.rightClickOnBox = this.rightClickOnBox.bind(this);
     this.startNewGame = this.startNewGame.bind(this);
+    this.pauseGame = this.pauseGame.bind(this);
   }
 
   openBox(row, col, openMine = true) {
@@ -190,6 +193,7 @@ class Minesweeper extends Component {
     this.setState({
       gameStarted: false,
       gameEnded: false,
+      gamePaused: false,
       success: false,
       userBoard: userBoard,
       flagCount: 0,
@@ -200,9 +204,15 @@ class Minesweeper extends Component {
     this.gameBoard = CreateBoard(size, this.state.totalMine);
   }
 
+  pauseGame(pause) {
+    this.setState({gamePaused: pause});
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(this.state.gameStarted !== prevState.gameStarted || this.state.gameEnded !== prevState.gameEnded) {
-      if(this.state.gameStarted && !this.state.gameEnded) {
+    if (this.state.gameStarted !== prevState.gameStarted ||
+        this.state.gameEnded !== prevState.gameEnded ||
+        this.state.gamePaused !== prevState.gamePaused) {
+      if (this.state.gameStarted && !this.state.gameEnded && !this.state.gamePaused) {
         this.timerId = setInterval(() => this.setState((state) => {
           return {timeCount: state.timeCount + 1}
         }), 1000);
@@ -214,30 +224,41 @@ class Minesweeper extends Component {
   }
 
   render() {
+    let board = null;
+    if(this.state.gamePaused) {
+      board = <Paused
+        size={this.state.boardSize}
+      />;
+    }
+    else {
+      board = <Board
+        size={this.state.boardSize}
+        mine={this.state.totalMine}
+        gameBoard={this.gameBoard}
+        userBoard={this.state.userBoard}
+        gameEnded={this.state.gameEnded}
+        success={this.state.success}
+        leftClickOnBox={this.leftClickOnBox}
+        rightClickOnBox={this.rightClickOnBox}
+      />;
+    }
     return (
       <div className='row'>
         <div className='col-8'>
-          <Board
-            size={this.state.boardSize}
-            mine={this.state.totalMine}
-            gameBoard={this.gameBoard}
-            userBoard={this.state.userBoard}
-            gameEnded={this.state.gameEnded}
-            success={this.state.success}
-            leftClickOnBox={this.leftClickOnBox}
-            rightClickOnBox={this.rightClickOnBox}
-          />
+          {board}
         </div>
         <div className='col-4'>
-          <ControlPanel
-            gameStarted={this.state.gameStarted}
-            gameEnded={this.state.gameEnded}
-            startNewGame={this.startNewGame}
-          />
           <Display
             totalMine={this.state.totalMine}
             flagCount={this.state.flagCount}
             timeCount={this.state.timeCount}
+          />
+          <ControlPanel
+            gameStarted={this.state.gameStarted}
+            gameEnded={this.state.gameEnded}
+            gamePaused={this.state.gamePaused}
+            startNewGame={this.startNewGame}
+            pauseGame={this.pauseGame}
           />
         </div>
       </div>
